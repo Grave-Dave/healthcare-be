@@ -11,20 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('available_terms', function (Blueprint $table) {
             $table->id();
-            $table->string('firstName');
-            $table->string('lastName');
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->foreignId('therapist_id')->constrained('therapists')->onDelete('cascade');
+            $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
+            $table->date('date');
+            $table->time('time');
+            $table->enum('status', ['available', 'booked', 'canceled'])->default('available');
             $table->integer('updated_by')->nullable();
             $table->integer('created_by')->nullable();
-            $table->integer('deleted_by')->nullable();
-            $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -33,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('available_terms');
     }
 };

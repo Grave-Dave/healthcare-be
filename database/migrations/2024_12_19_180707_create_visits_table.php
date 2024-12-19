@@ -11,20 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('visits', function (Blueprint $table) {
             $table->id();
-            $table->string('firstName');
-            $table->string('lastName');
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('availableTerm_id')->constrained('available_terms')->onDelete('cascade');
+            $table->enum('status', ['pending', 'confirmed', 'canceled'])->default('pending');
             $table->integer('updated_by')->nullable();
             $table->integer('created_by')->nullable();
-            $table->integer('deleted_by')->nullable();
-            $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -33,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('visits');
     }
 };
