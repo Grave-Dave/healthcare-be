@@ -27,6 +27,8 @@ class User extends Authenticatable
     const USER_PASSWORD = 'password';
     const THERAPIST_RELATION = 'therapist';
     const VISITS_RELATION = 'visits';
+    const REFRESH_TOKEN = 'refresh_token';
+    const REFRESH_TOKEN_EXPIRE = 'refresh_token_expires_at';
     const CREATED_BY = 'created_by';
     const UPDATED_BY = 'updated_by';
     const DELETED_BY = 'deleted_by';
@@ -48,6 +50,8 @@ class User extends Authenticatable
         self::USER_PHONE,
         self::USER_EMAIL,
         self::USER_PASSWORD,
+        self::REFRESH_TOKEN,
+        self::REFRESH_TOKEN_EXPIRE,
         self::CREATED_BY,
         self::UPDATED_BY,
         self::DELETED_BY,

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait HasUserStamps
 {
-    protected static function bootHasHasUserStamps(): void
+    protected static function bootHasUserStamps(): void
     {
         static::creating(function ($model) {
             $model->created_by = Auth::id();
