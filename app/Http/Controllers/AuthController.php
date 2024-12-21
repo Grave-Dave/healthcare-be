@@ -40,11 +40,17 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('API Token')->plainTextToken;
+        $refreshToken = base64_encode(random_bytes(64));
+
+        $user->update([
+            'refresh_token' => $refreshToken,
+            'refresh_token_expires_at' => Carbon::now()->addDays(),
+        ]);
 
         return response()->json([
-            'user' => $user,
             'access_token' => $token,
-        ], 201);
+            'token_type' => 'Bearer',
+        ], 201)->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
     }
 
     /**
@@ -64,13 +70,13 @@ class AuthController extends Controller
 
             $user->update([
                 'refresh_token' => $refreshToken,
-                'refresh_token_expires_at' => Carbon::now()->addDays(7),
+                'refresh_token_expires_at' => Carbon::now()->addDays(),
             ]);
 
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-            ])->cookie('refresh_token', $refreshToken, 60 * 24 * 7, '/', null, true, true);
+            ])->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
         }
 
         return response()->json(['message' => 'Nieprawidłowe dane'], 401);
@@ -112,13 +118,13 @@ class AuthController extends Controller
         $newRefreshToken = base64_encode(random_bytes(64));
         $user->update([
             'refresh_token' => $newRefreshToken,
-            'refresh_token_expires_at' => Carbon::now()->addDays(7),
+            'refresh_token_expires_at' => Carbon::now()->addDays(),
         ]);
 
         return response()->json([
             'access_token' => $newAccessToken,
             'token_type' => 'Bearer',
-        ])->cookie('refresh_token', $newRefreshToken, 60 * 24 * 7, '/', null, true, true);
+        ])->cookie('refresh_token', $newRefreshToken, 60 * 24, '/', null, true, true);
     }
 
     public function logout(Request $request): JsonResponse
