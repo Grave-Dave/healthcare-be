@@ -20,15 +20,15 @@ class User extends Authenticatable
     const TABLE_NAME = 'users';
 
     const ID_COLUMN = 'id';
-    const USER_FIRST_NAME = 'firstName';
-    const USER_LAST_NAME = 'lastName';
-    const USER_EMAIL = 'email';
-    const USER_PHONE = 'phone';
-    const USER_PASSWORD = 'password';
+    const FIRST_NAME = 'firstName';
+    const LAST_NAME = 'lastName';
+    const EMAIL = 'email';
+    const PHONE = 'phone';
+    const PASSWORD = 'password';
     const THERAPIST_RELATION = 'therapist';
     const VISITS_RELATION = 'visits';
     const REFRESH_TOKEN = 'refresh_token';
-    const REFRESH_TOKEN_EXPIRE = 'refresh_token_expires_at';
+    const REFRESH_TOKEN_EXPIRE_DATE = 'refresh_token_expires_at';
     const CREATED_BY = 'created_by';
     const UPDATED_BY = 'updated_by';
     const DELETED_BY = 'deleted_by';
@@ -45,13 +45,13 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        self::USER_FIRST_NAME,
-        self::USER_LAST_NAME,
-        self::USER_PHONE,
-        self::USER_EMAIL,
-        self::USER_PASSWORD,
+        self::FIRST_NAME,
+        self::LAST_NAME,
+        self::PHONE,
+        self::EMAIL,
+        self::PASSWORD,
         self::REFRESH_TOKEN,
-        self::REFRESH_TOKEN_EXPIRE,
+        self::REFRESH_TOKEN_EXPIRE_DATE,
         self::CREATED_BY,
         self::UPDATED_BY,
         self::DELETED_BY,
@@ -63,7 +63,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        self::USER_PASSWORD,
+        self::PASSWORD,
         'remember_token',
     ];
 
@@ -74,7 +74,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        self::USER_PASSWORD => 'hashed',
+        self::PASSWORD => 'hashed',
     ];
 
     /**
@@ -94,7 +94,7 @@ class User extends Authenticatable
      */
     public function getUserFirstName(): ?string
     {
-        return $this->getAttribute(self::USER_FIRST_NAME);
+        return $this->getAttribute(self::FIRST_NAME);
     }
 
     /**
@@ -104,7 +104,7 @@ class User extends Authenticatable
      */
     public function getUserLastName(): ?string
     {
-        return $this->getAttribute(self::USER_LAST_NAME);
+        return $this->getAttribute(self::LAST_NAME);
     }
 
     /**
@@ -114,7 +114,7 @@ class User extends Authenticatable
      */
     public function getUserPhone(): ?string
     {
-        return $this->getAttribute(self::USER_PHONE);
+        return $this->getAttribute(self::PHONE);
     }
 
     /**
@@ -124,7 +124,7 @@ class User extends Authenticatable
      */
     public function getUserEmail(): ?string
     {
-        return $this->getAttribute(self::USER_EMAIL);
+        return $this->getAttribute(self::EMAIL);
     }
 
     public function creator(): BelongsTo
@@ -160,6 +160,6 @@ class User extends Authenticatable
 
     public function visits(): HasMany
     {
-        return $this->hasMany(Visit::class, Visit::VISIT_USER_ID, self::ID_COLUMN);
+        return $this->hasMany(Visit::class, Visit::USER_ID, self::ID_COLUMN);
     }
 }

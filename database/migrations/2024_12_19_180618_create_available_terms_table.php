@@ -16,11 +16,13 @@ return new class extends Migration
             $table->foreignId('therapist_id')->constrained('therapists')->onDelete('cascade');
             $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
             $table->date('date');
-            $table->time('time');
-            $table->enum('status', ['available', 'booked', 'canceled'])->default('available');
+            $table->integer('time');
+            $table->enum('status', ['0', '1', '2'])->default('available');
             $table->integer('updated_by')->nullable();
             $table->integer('created_by')->nullable();
+            $table->integer('deleted_by')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

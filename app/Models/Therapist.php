@@ -19,6 +19,9 @@ class Therapist extends Model
     const USER_RELATION = 'user';
     const AVAILABLE_TERMS_RELATION = 'availableTerms';
     const LOCATIONS_RELATION = 'locations';
+    const CREATED_AT  = 'created_at';
+    const UPDATED_AT  = 'updated_at';
+    const MAIN_THERAPIST_ID = 1;
 
     /** @var int */
     protected $primaryKey = self::ID_COLUMN;
@@ -70,7 +73,7 @@ class Therapist extends Model
      */
     public function availableTerms(): HasMany
     {
-        return $this->hasMany(AvailableTerm::class, AvailableTerm::AVAILABLE_TERM_THERAPIST_ID);
+        return $this->hasMany(AvailableTerm::class, AvailableTerm::THERAPIST_ID);
     }
 
     /**

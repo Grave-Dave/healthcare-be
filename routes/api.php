@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AvailableTermController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,15 +16,39 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+/** AUTH */
+
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/auth/refresh', [AuthController::class, 'refreshToken']);
 
+/** SECURED */
+
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    /** AUTH */
 
     Route::get('/user', [AuthController::class, 'checkAuth']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    /** USER DATA */
+
+    Route::get('/user-data/{userId}', [AuthController::class, 'show']);
+
+    Route::post('/user-data/{userId}', [AuthController::class, 'update']);
+
+
+    /** AVAILABLE TERMS */
+
+    Route::post('/terms', [AvailableTermController::class, 'show']);
+
+    Route::post('/new-terms', [AvailableTermController::class, 'store']);
+
+    Route::delete('/term/{termId}', [AvailableTermController::class, 'delete']);
+
+    /** USER VISITS */
+
 });

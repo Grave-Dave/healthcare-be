@@ -73,6 +73,6 @@ class Location extends Model
      */
     public function availableTerms(): HasMany
     {
-        return $this->hasMany(AvailableTerm::class, AvailableTerm::AVAILABLE_TERM_LOCATION_ID, self::ID_COLUMN);
+        return $this->hasMany(AvailableTerm::class, AvailableTerm::LOCATION_ID, self::ID_COLUMN);
     }
 }

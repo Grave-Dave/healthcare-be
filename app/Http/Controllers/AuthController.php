@@ -39,7 +39,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $token = $user->createToken('API Token')->plainTextToken;
+        $token = $user->createToken('access-token')->plainTextToken;
         $refreshToken = base64_encode(random_bytes(64));
 
         $user->update([
@@ -53,9 +53,6 @@ class AuthController extends Controller
         ], 201)->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
     }
 
-    /**
-     * @throws Exception
-     */
     public function login(Request $request): JsonResponse
     {
         $request->validate([
@@ -65,7 +62,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
-            $token = $user->createToken('API Token')->plainTextToken;
+            $token = $user->createToken('access-token')->plainTextToken;
             $refreshToken = base64_encode(random_bytes(64));
 
             $user->update([
@@ -79,7 +76,7 @@ class AuthController extends Controller
             ])->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
         }
 
-        return response()->json(['message' => 'Nieprawidłowe dane'], 401);
+        return response()->json(['message' => 'Nieprawidłowe dane'], 403);
     }
 
     public function checkAuth(Request $request): JsonResponse
@@ -98,15 +95,12 @@ class AuthController extends Controller
         return response()->json(['user' => $user, 'isAdmin' => $isAdmin]);
     }
 
-    /**
-     * @throws Exception
-     */
     public function refreshToken(Request $request): JsonResponse
     {
         $refreshToken = $request->cookie('refresh_token');
 
         $user = User::where(User::REFRESH_TOKEN, $refreshToken)
-            ->where(User::REFRESH_TOKEN_EXPIRE, '>', Carbon::now())
+            ->where(User::REFRESH_TOKEN_EXPIRE_DATE, '>', Carbon::now())
             ->first();
 
         if (!$user) {

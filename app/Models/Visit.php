@@ -15,9 +15,9 @@ class Visit extends Model
     const TABLE_NAME = 'visits';
 
     const ID_COLUMN = 'id';
-    const VISIT_USER_ID = 'user_id';
-    const VISIT_AVAILABLE_TERM_ID = 'availableTerm_id';
-    const VISIT_STATUS = 'status';
+    const USER_ID = 'user_id';
+    const AVAILABLE_TERM_ID = 'availableTerm_id';
+    const STATUS = 'status';
     const USER_RELATION = 'user';
     const AVAILABLE_TERM_RELATION = 'availableTerm';
     const CREATED_BY = 'created_by';
@@ -46,9 +46,9 @@ class Visit extends Model
      */
 
     protected $fillable = [
-        self::VISIT_USER_ID,
-        self::VISIT_AVAILABLE_TERM_ID,
-        self::VISIT_STATUS,
+        self::USER_ID,
+        self::AVAILABLE_TERM_ID,
+        self::STATUS,
         self::CREATED_BY,
         self::UPDATED_BY,
     ];
@@ -70,7 +70,7 @@ class Visit extends Model
      */
     public function getUserId(): ?int
     {
-        return $this->getAttribute(self::VISIT_USER_ID);
+        return $this->getAttribute(self::USER_ID);
     }
 
     /**
@@ -80,7 +80,7 @@ class Visit extends Model
      */
     public function getAvailableTermId(): ?int
     {
-        return $this->getAttribute(self::VISIT_AVAILABLE_TERM_ID);
+        return $this->getAttribute(self::AVAILABLE_TERM_ID);
     }
 
     /**
@@ -90,7 +90,7 @@ class Visit extends Model
      */
     public function getStatus(): ?int
     {
-        return $this->getAttribute(self::VISIT_STATUS);
+        return $this->getAttribute(self::STATUS);
     }
 
     public function creator(): BelongsTo
@@ -110,7 +110,7 @@ class Visit extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, self::VISIT_USER_ID, User::ID_COLUMN);
+        return $this->belongsTo(User::class, self::USER_ID, User::ID_COLUMN);
     }
 
     /**
@@ -120,6 +120,6 @@ class Visit extends Model
      */
     public function availableTerm(): BelongsTo
     {
-        return $this->belongsTo(AvailableTerm::class, self::VISIT_AVAILABLE_TERM_ID, AvailableTerm::ID_COLUMN);
+        return $this->belongsTo(AvailableTerm::class, self::AVAILABLE_TERM_ID, AvailableTerm::ID_COLUMN);
     }
 }

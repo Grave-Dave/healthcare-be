@@ -16,20 +16,21 @@ class AvailableTerm extends Model
     const TABLE_NAME = 'available_terms';
 
     const ID_COLUMN = 'id';
-    const AVAILABLE_TERM_THERAPIST_ID = 'therapist_id';
-    const AVAILABLE_TERM_LOCATION_ID = 'location_id';
-    const AVAILABLE_TERM_DATE = 'date';
-    const AVAILABLE_TERM_TIME = 'time';
-    const AVAILABLE_TERM_STATUS = 'status';
+    const THERAPIST_ID = 'therapist_id';
+    const LOCATION_ID = 'location_id';
+    const DATE = 'date';
+    const TIME = 'time';
+    const STATUS = 'status';
     const THERAPIST_RELATION = 'therapist';
     const LOCATION_RELATION = 'location';
     const VISITS_RELATION = 'visits';
     const CREATED_BY = 'created_by';
     const UPDATED_BY = 'updated_by';
-
-    const STATUS_AVAILABLE = 0;
-    const STATUS_BOOKED = 1;
-    const STATUS_CANCELED = 2;
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+    const STATUS_AVAILABLE = '0';
+    const STATUS_BOOKED = '1';
+    const STATUS_CANCELED = '2';
 
     const STATUS_ENUM = [
         self::STATUS_AVAILABLE,
@@ -49,11 +50,11 @@ class AvailableTerm extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        self::AVAILABLE_TERM_THERAPIST_ID,
-        self::AVAILABLE_TERM_LOCATION_ID,
-        self::AVAILABLE_TERM_DATE,
-        self::AVAILABLE_TERM_TIME,
-        self::AVAILABLE_TERM_STATUS,
+        self::THERAPIST_ID,
+        self::LOCATION_ID,
+        self::DATE,
+        self::TIME,
+        self::STATUS,
         self::CREATED_BY,
         self::UPDATED_BY,
     ];
@@ -75,7 +76,7 @@ class AvailableTerm extends Model
      */
     public function getTherapistId(): ?int
     {
-        return $this->getAttribute(self::AVAILABLE_TERM_THERAPIST_ID);
+        return $this->getAttribute(self::THERAPIST_ID);
     }
 
     /**
@@ -85,7 +86,7 @@ class AvailableTerm extends Model
      */
     public function getLocationId(): ?int
     {
-        return $this->getAttribute(self::AVAILABLE_TERM_LOCATION_ID);
+        return $this->getAttribute(self::LOCATION_ID);
     }
 
     /**
@@ -95,27 +96,27 @@ class AvailableTerm extends Model
      */
     public function getDate(): ?string
     {
-        return $this->getAttribute(self::AVAILABLE_TERM_DATE);
+        return $this->getAttribute(self::DATE);
     }
 
     /**
      *  Getter for time
      *
-     * @return string|null
+     * @return int|null
      */
-    public function getTime(): ?string
+    public function getTime(): ?int
     {
-        return $this->getAttribute(self::AVAILABLE_TERM_TIME);
+        return $this->getAttribute(self::TIME);
     }
 
     /**
      *  Getter for status
      *
-     * @return int|null
+     * @return string|null
      */
-    public function getStatus(): ?int
+    public function getStatus(): ?string
     {
-        return $this->getAttribute(self::AVAILABLE_TERM_STATUS);
+        return $this->getAttribute(self::STATUS);
     }
 
     public function creator(): BelongsTo
@@ -135,7 +136,7 @@ class AvailableTerm extends Model
      */
     public function therapist(): BelongsTo
     {
-        return $this->belongsTo(Therapist::class, self::AVAILABLE_TERM_THERAPIST_ID, Therapist::ID_COLUMN);
+        return $this->belongsTo(Therapist::class, self::THERAPIST_ID, Therapist::ID_COLUMN);
     }
 
     /**
@@ -145,7 +146,7 @@ class AvailableTerm extends Model
      */
     public function location(): BelongsTo
     {
-        return $this->belongsTo(Location::class, self::AVAILABLE_TERM_LOCATION_ID, Location::ID_COLUMN);
+        return $this->belongsTo(Location::class, self::LOCATION_ID, Location::ID_COLUMN);
     }
 
     /**
@@ -155,6 +156,6 @@ class AvailableTerm extends Model
      */
     public function visits(): HasMany
     {
-        return $this->hasMany(Visit::class, Visit::VISIT_AVAILABLE_TERM_ID, self::ID_COLUMN);
+        return $this->hasMany(Visit::class, Visit::AVAILABLE_TERM_ID, self::ID_COLUMN);
     }
 }
