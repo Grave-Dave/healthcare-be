@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvailableTermController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,8 +40,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/user-data/{userId}', [AuthController::class, 'update']);
 
+    /** LOCATIONS */
+
+    Route::get('/locations', [LocationController::class, 'index']);
 
     /** AVAILABLE TERMS */
+
+    Route::post('/month-terms', [AvailableTermController::class, 'index']);
 
     Route::post('/terms', [AvailableTermController::class, 'show']);
 

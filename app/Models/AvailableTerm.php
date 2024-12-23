@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AvailableTerm extends Model
 {
     use HasFactory;
     use HasUserstamps;
+    use SoftDeletes;
 
     const TABLE_NAME = 'available_terms';
 
@@ -26,8 +28,10 @@ class AvailableTerm extends Model
     const VISITS_RELATION = 'visits';
     const CREATED_BY = 'created_by';
     const UPDATED_BY = 'updated_by';
+    const DELETED_BY = 'updated_by';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
+    const DELETED_AT = 'deleted_at';
     const STATUS_AVAILABLE = '0';
     const STATUS_BOOKED = '1';
     const STATUS_CANCELED = '2';
@@ -43,6 +47,8 @@ class AvailableTerm extends Model
 
     /** @var string */
     protected $table = self::TABLE_NAME;
+
+    protected $dates = ['deleted_at'];
 
     /**
      * The attributes that are mass assignable.
