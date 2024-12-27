@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
             $table->date('date');
             $table->integer('time');
-            $table->enum('status', ['0', '1', '2'])->default('available');
+            $table->enum('status', ['0', '1', '2'])->default('0');
             $table->integer('updated_by')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('deleted_by')->nullable();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\Therapist;
 use App\Models\User;
 use Exception;
@@ -92,7 +93,7 @@ class AuthController extends Controller
 
         $isAdmin = Therapist::where(Therapist::USER_ID, $user->getId())->exists();
 
-        return response()->json(['user' => $user, 'isAdmin' => $isAdmin]);
+        return response()->json(['user' => new UserResource($user), 'isAdmin' => $isAdmin]);
     }
 
     public function refreshToken(Request $request): JsonResponse

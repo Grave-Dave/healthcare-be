@@ -23,7 +23,6 @@ class AvailableTermController extends Controller
     use Authorization;
     use SoftDeletes;
 
-
     /**
      * Display a list of all available future terms.
      *
@@ -80,6 +79,7 @@ class AvailableTermController extends Controller
             ->whereDate(AvailableTerm::DATE, $date)
             ->where(AvailableTerm::STATUS, AvailableTerm::STATUS_AVAILABLE)
             ->with(AvailableTerm::LOCATION_RELATION)
+            ->orderBy(AvailableTerm::TIME)
             ->get();
 
         return response()->json(new AvailableTermCollectionResource($availableTerms));

@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvailableTermController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,9 +38,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     /** USER DATA */
 
-    Route::get('/user-data/{userId}', [AuthController::class, 'show']);
+    Route::delete('/user-delete', [UserController::class, 'delete']);
 
-    Route::post('/user-data/{userId}', [AuthController::class, 'update']);
+    Route::post('/user-update', [UserController::class, 'update']);
 
     /** LOCATIONS */
 
@@ -55,5 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/term/{termId}', [AvailableTermController::class, 'delete']);
 
     /** USER VISITS */
+
+    Route::post('/new-visit', [VisitController::class, 'store']);
 
 });

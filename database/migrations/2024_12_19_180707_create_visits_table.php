@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('availableTerm_id')->constrained('available_terms')->onDelete('cascade');
-            $table->enum('status', ['pending', 'confirmed', 'canceled'])->default('pending');
+            $table->enum('status', ['0', '1', '2'])->default('0');
             $table->integer('updated_by')->nullable();
             $table->integer('created_by')->nullable();
             $table->timestamps();
