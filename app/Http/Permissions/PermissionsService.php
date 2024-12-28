@@ -15,27 +15,39 @@ class PermissionsService
         return User::where(User::ID_COLUMN, $user->id)->first();
     }
 
-    public function hasUserPermissions($user): bool
+    public function hasUserPermissions($user, $resource): bool
     {
         $existingUser = $this->findUser($user);
 
-        if ($existingUser) {
-            return true;
-        };
+        if (!$existingUser) {
+            return false;
+        }
 
-        return false;
+        if ($resource) {
+            return $resource->user_id === $existingUser->getId();
+        }
+
+        return true;
     }
 
-    public function hasAdminPermissions($user): bool
+    public function hasAdminPermissions($user, $resource): bool
     {
         $existingUser = $this->findUser($user);
 
-        $isAdmin = Therapist::where(Therapist::USER_ID, $existingUser?->getId())->exists();
+        if (!$existingUser) {
+            return false;
+        }
 
-        if ($isAdmin) {
-            return true;
+        $therapist = Therapist::where(Therapist::USER_ID, $existingUser->getId())->first();
+
+        if (!$therapist) {
+            return false;
         };
 
-        return false;
+        if ($resource) {
+            return $resource->therapist_id === $therapist->getId();
+        }
+
+        return true;
     }
 }

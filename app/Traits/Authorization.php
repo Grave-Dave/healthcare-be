@@ -10,12 +10,12 @@ trait Authorization
     /**
      * @throws AuthorizationException
      */
-    public function authorizeUser($user): void
+    public function authorizeUser($user, $resource = false): void
     {
         /** @var PermissionsService $service */
         $service = app(PermissionsService::class);
 
-        if (!$service->hasUserPermissions($user)) {
+        if (!$service->hasUserPermissions($user, $resource)) {
 
             throw new AuthorizationException("You don't have permissions for that action", 403);
         }
@@ -24,12 +24,12 @@ trait Authorization
     /**
      * @throws AuthorizationException
      */
-    public function authorizeAdmin($user): void
+    public function authorizeAdmin($user, $resource = false): void
     {
         /** @var PermissionsService $service */
         $service = app(PermissionsService::class);
 
-        if (!$service->hasAdminPermissions($user)) {
+        if (!$service->hasAdminPermissions($user, $resource)) {
 
             throw new AuthorizationException("You don't have permissions for that action", 403);
         }

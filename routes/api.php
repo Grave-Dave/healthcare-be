@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminVisitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvailableTermController;
 use App\Http\Controllers\LocationController;
@@ -58,6 +59,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     /** USER VISITS */
 
+    Route::get('/user-visits', [VisitController::class, 'index']);
+
     Route::post('/new-visit', [VisitController::class, 'store']);
+
+    Route::delete('/delete-visit/{visitId}', [VisitController::class, 'delete']);
+
+    /** ADMIN VISITS */
+
+    Route::get('/admin-visits', [AdminVisitController::class, 'index']);
+
+    Route::post('/update-visit/{visitId}', [AdminVisitController::class, 'update']);
+
+    Route::delete('/delete-visit/{visitId}', [AdminVisitController::class, 'delete']);
+
+    Route::post('/admin-past-visits', [AdminVisitController::class, 'show']);
 
 });

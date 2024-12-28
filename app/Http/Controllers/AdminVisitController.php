@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\VisitCollectionResource;
-use App\Http\Resources\VisitResource;
+use App\Models\Therapist;
 use App\Traits\Authorization;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -16,12 +16,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-class VisitController extends Controller
+class AdminVisitController extends Controller
 {
     use Authorization;
 
     /**
-     * Show all incoming and past visits for a user.
+     * Show all incoming visits for the therapist.
      *
      * @return JsonResponse
      * @throws AuthorizationException
@@ -30,11 +30,13 @@ class VisitController extends Controller
     {
         $user = Auth::user();
 
-        $this->authorizeUser($user);
+        $this->authorizeAdmin($user);
 
         $currentDateTime = now();
 
-        $incomingVisits = Visit::select(
+        $therapistId = Therapist::where(Therapist::USER_ID, $user->getId())->first()->getId();
+
+        $incomingPendingVisits = Visit::select(
             Visit::TABLE_NAME . "." . Visit::ID_COLUMN,
             Visit::TABLE_NAME . "." . Visit::USER_ID,
             Visit::TABLE_NAME . "." . Visit::AVAILABLE_TERM_ID,
@@ -46,13 +48,14 @@ class VisitController extends Controller
                 "=",
                 AvailableTerm::TABLE_NAME . "." . AvailableTerm::ID_COLUMN
             )
-            ->where(Visit::TABLE_NAME . "." . Visit::USER_ID, $user->getId())
+            ->where(AvailableTerm::TABLE_NAME . "." . AvailableTerm::THERAPIST_ID, $therapistId)
             ->where(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE, '>', $currentDateTime)
+            ->where(Visit::TABLE_NAME . "." . Visit::STATUS, Visit::STATUS_PENDING)
             ->with([Visit::AVAILABLE_TERM_RELATION . "." . AvailableTerm::LOCATION_RELATION, Visit::USER_RELATION])
             ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE)
             ->get();
 
-        $pastVisits = Visit::select(
+        $incomingConfirmedVisits = Visit::select(
             Visit::TABLE_NAME . "." . Visit::ID_COLUMN,
             Visit::TABLE_NAME . "." . Visit::USER_ID,
             Visit::TABLE_NAME . "." . Visit::AVAILABLE_TERM_ID,
@@ -64,85 +67,28 @@ class VisitController extends Controller
                 "=",
                 AvailableTerm::TABLE_NAME . "." . AvailableTerm::ID_COLUMN
             )
-            ->where(Visit::TABLE_NAME . "." . Visit::USER_ID, $user->getId())
-            ->where(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE, '<=', $currentDateTime)
+            ->where(AvailableTerm::TABLE_NAME . "." . AvailableTerm::THERAPIST_ID, $therapistId)
+            ->where(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE, '>', $currentDateTime)
+            ->where(Visit::TABLE_NAME . "." . Visit::STATUS, Visit::STATUS_CONFIRMED)
             ->with([Visit::AVAILABLE_TERM_RELATION . "." . AvailableTerm::LOCATION_RELATION, Visit::USER_RELATION])
-            ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE, 'desc')
+            ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE)
             ->get();
 
         return response()->json([
             'message' => 'Visits retrieved successfully.',
-            'incoming_visits' => new VisitCollectionResource($incomingVisits),
-            'past_visits' => new VisitCollectionResource($pastVisits),
+            'incoming_pending_visits' => new VisitCollectionResource($incomingPendingVisits),
+            'incoming_confirmed_visits' => new VisitCollectionResource($incomingConfirmedVisits),
         ]);
     }
 
     /**
-     * Create a new visit based on an available term.
+     * Confirm visit by the therapist.
      *
-     * @param Request $request
-     * @return JsonResponse
-     * @throws AuthorizationException|ValidationException
-     */
-    public function store(Request $request): JsonResponse
-    {
-        $user = Auth::user();
-
-        $this->authorizeUser($user);
-
-        $validator = Validator::make($request->all(), [
-            'availableTermId' => ['required', Rule::exists(AvailableTerm::TABLE_NAME, AvailableTerm::ID_COLUMN)],
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $validatedData = $validator->validated();
-
-        try {
-            DB::beginTransaction();
-
-            $availableTerm = AvailableTerm::where(AvailableTerm::ID_COLUMN, $validatedData['availableTermId'])
-                ->where(AvailableTerm::STATUS, AvailableTerm::STATUS_AVAILABLE)
-                ->first();
-
-            if (!$availableTerm) {
-                return response()->json(['error' => 'The selected term is not available.'], 404);
-            }
-
-            $availableTerm->status = AvailableTerm::STATUS_BOOKED;
-            $availableTerm->save();
-
-            $visit = Visit::create([
-                Visit::USER_ID => $user->getId(),
-                Visit::AVAILABLE_TERM_ID => $availableTerm->getId(),
-                Visit::STATUS => Visit::STATUS_PENDING
-            ]);
-
-            DB::commit();
-
-            $visit->load([Visit::AVAILABLE_TERM_RELATION . "." . AvailableTerm::LOCATION_RELATION, Visit::USER_RELATION]);
-
-            return response()->json(new VisitResource($visit), 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'error' => 'An error occurred while creating the visit.',
-                'details' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Cancel a visit and update the available term status.
-     *
-     * @param int $visitId
+     * @param $visitId
      * @return JsonResponse
      * @throws AuthorizationException
      */
-    public function delete(int $visitId): JsonResponse
+    public function update($visitId): JsonResponse
     {
         $user = Auth::user();
 
@@ -152,7 +98,48 @@ class VisitController extends Controller
             return response()->json(['error' => 'Visit not found.'], 404);
         }
 
-        $this->authorizeUser($user, $visit);
+        $this->authorizeAdmin($user, $visit->availableTerm);
+
+        if ($visit->status !== Visit::STATUS_PENDING) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Visit status can only be updated from pending to confirmed.',
+            ], 400);
+        }
+
+        $visit->status = Visit::STATUS_CONFIRMED;
+        $visit->save();
+
+        return response()->json([
+            'message' => 'Visit status updated successfully.',
+        ]);
+    }
+
+    /**
+     * Cancel a visit and update the available term status.
+     *
+     * @param Request $request
+     * @param int $visitId
+     * @return JsonResponse
+     * @throws AuthorizationException
+     */
+    public function delete(Request $request, int $visitId): JsonResponse
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'withTerm' => 'required|boolean',
+            'visitId' => ['required', 'boolean', Rule::exists(Visit::TABLE_NAME, Visit::ID_COLUMN)],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $visit = Visit::find($visitId);
+        $withTerm = $request->withTerm;
+
+        $this->authorizeAdmin($user, $visit->availableTerm);
 
         try {
             DB::beginTransaction();
@@ -166,8 +153,14 @@ class VisitController extends Controller
             $visit->save();
             $visit->delete();
 
-            $availableTerm->status = AvailableTerm::STATUS_AVAILABLE;
-            $availableTerm->save();
+            if ($withTerm) {
+                $availableTerm->status = AvailableTerm::STATUS_CANCELED;
+                $availableTerm->save();
+                $availableTerm->delete();
+            } else {
+                $availableTerm->status = AvailableTerm::STATUS_AVAILABLE;
+                $availableTerm->save();
+            }
 
             DB::commit();
 

@@ -18,7 +18,9 @@ return new class extends Migration
             $table->enum('status', ['0', '1', '2'])->default('0');
             $table->integer('updated_by')->nullable();
             $table->integer('created_by')->nullable();
+            $table->integer('deleted_by')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

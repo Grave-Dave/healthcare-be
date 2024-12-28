@@ -118,9 +118,11 @@ class AvailableTermController extends Controller
         $startHour = $data['time'][0];
         $endHour = $data['time'][1];
 
+        $therapistId = Therapist::where(Therapist::USER_ID, $user->getId())->first()->getId();
+
         $timeSlots = range($startHour, $endHour);
 
-        $existingTerms = AvailableTerm::where(AvailableTerm::THERAPIST_ID, $user->getId())
+        $existingTerms = AvailableTerm::where(AvailableTerm::THERAPIST_ID, $therapistId)
             ->whereDate(AvailableTerm::DATE, $date)
             ->whereIn(AvailableTerm::TIME, $timeSlots)
             ->pluck(AvailableTerm::TIME)
@@ -133,7 +135,7 @@ class AvailableTermController extends Controller
         foreach ($newTimeSlots as $time) {
             $newTerms[] = AvailableTerm::create([
                 AvailableTerm::LOCATION_ID => $locationId,
-                AvailableTerm::THERAPIST_ID => $user->getId(),
+                AvailableTerm::THERAPIST_ID => $therapistId,
                 AvailableTerm::DATE => $date,
                 AvailableTerm::TIME => $time,
                 AvailableTerm::STATUS => AvailableTerm::STATUS_AVAILABLE,
@@ -171,6 +173,8 @@ class AvailableTermController extends Controller
                 throw new AuthorizationException('Only available visits can be deleted.', 403);
             }
 
+            $availableTerm->status = AvailableTerm::STATUS_CANCELED;
+            $availableTerm->save();
             $availableTerm->delete();
 
             return response()->json([

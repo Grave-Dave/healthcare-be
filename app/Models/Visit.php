@@ -6,11 +6,13 @@ use App\Traits\HasUserStamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Visit extends Model
 {
     use HasFactory;
     use HasUserstamps;
+    use SoftDeletes;
 
     const TABLE_NAME = 'visits';
 
@@ -23,9 +25,9 @@ class Visit extends Model
     const CREATED_BY = 'created_by';
     const UPDATED_BY = 'updated_by';
 
-    const STATUS_PENDING = 0;
-    const STATUS_CONFIRMED = 1;
-    const STATUS_CANCELED = 2;
+    const STATUS_PENDING = '0';
+    const STATUS_CONFIRMED = '1';
+    const STATUS_CANCELED = '2';
 
     const STATUS_ENUM = [
         self::STATUS_PENDING,
@@ -86,9 +88,9 @@ class Visit extends Model
     /**
      *  Getter for status
      *
-     * @return int|null
+     * @return string|null
      */
-    public function getStatus(): ?int
+    public function getStatus(): ?string
     {
         return $this->getAttribute(self::STATUS);
     }
