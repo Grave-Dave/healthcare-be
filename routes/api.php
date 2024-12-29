@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminPanelController;
 use App\Http\Controllers\AdminVisitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvailableTermController;
@@ -43,6 +44,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/user-update', [UserController::class, 'update']);
 
+    Route::get('/users', [UserController::class, 'index']);
+
     /** LOCATIONS */
 
     Route::get('/locations', [LocationController::class, 'index']);
@@ -73,6 +76,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::delete('/delete-visit/{visitId}', [AdminVisitController::class, 'delete']);
 
-    Route::post('/admin-past-visits', [AdminVisitController::class, 'show']);
+    /** ADMIN PANEL */
+
+    Route::post('/admin-month-terms', [AdminPanelController::class, 'index']);
+
+    Route::post('/admin-visits', [AdminPanelController::class, 'showByDate']);
+
+    Route::get('/admin-user-visits/{userId}', [AdminPanelController::class, 'showByUser']);
 
 });

@@ -45,9 +45,9 @@ class AvailableTermController extends Controller
         $year = $validatedDate['year'];
         $today = Carbon::today();
 
-        $futureTerms = AvailableTerm::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->whereDate('date', '>=', $today)
+        $futureTerms = AvailableTerm::whereYear(AvailableTerm::DATE, $year)
+            ->whereMonth(AvailableTerm::DATE, $month)
+            ->whereDate(AvailableTerm::DATE, '>=', $today)
             ->where(AvailableTerm::STATUS, AvailableTerm::STATUS_AVAILABLE)
             ->distinct()
             ->orderBy(AvailableTerm::DATE)

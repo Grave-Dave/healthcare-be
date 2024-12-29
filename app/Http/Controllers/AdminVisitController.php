@@ -127,9 +127,11 @@ class AdminVisitController extends Controller
     {
         $user = Auth::user();
 
-        $validator = Validator::make($request->all(), [
-            'withTerm' => 'required|boolean',
-            'visitId' => ['required', 'boolean', Rule::exists(Visit::TABLE_NAME, Visit::ID_COLUMN)],
+        $data = array_merge($request->all(), ['visitId' => $visitId]);
+
+        $validator = Validator::make($data, [
+            'withTerm' => ['required', 'boolean'],
+            'visitId' => ['required', 'integer', Rule::exists(Visit::TABLE_NAME, Visit::ID_COLUMN)],
         ]);
 
         if ($validator->fails()) {
