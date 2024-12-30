@@ -74,7 +74,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/update-visit/{visitId}', [AdminVisitController::class, 'update']);
 
-    Route::delete('/delete-visit/{visitId}', [AdminVisitController::class, 'delete']);
+    Route::delete('/admin-delete-visit/{visitId}', [AdminVisitController::class, 'delete']);
 
     /** ADMIN PANEL */
 

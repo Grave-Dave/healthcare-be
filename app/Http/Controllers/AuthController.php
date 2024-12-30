@@ -44,7 +44,7 @@ class AuthController extends Controller
         $refreshToken = base64_encode(random_bytes(64));
 
         $user->update([
-            'refresh_token' => $refreshToken,
+            'refresh_token' => Hash::make($refreshToken),
             'refresh_token_expires_at' => Carbon::now()->addDays(),
         ]);
 
@@ -67,7 +67,7 @@ class AuthController extends Controller
             $refreshToken = base64_encode(random_bytes(64));
 
             $user->update([
-                'refresh_token' => $refreshToken,
+                'refresh_token' => Hash::make($refreshToken),
                 'refresh_token_expires_at' => Carbon::now()->addDays(),
             ]);
 
@@ -100,19 +100,20 @@ class AuthController extends Controller
     {
         $refreshToken = $request->cookie('refresh_token');
 
-        $user = User::where(User::REFRESH_TOKEN, $refreshToken)
-            ->where(User::REFRESH_TOKEN_EXPIRE_DATE, '>', Carbon::now())
-            ->first();
+        $usersWithTokens = User::where(User::REFRESH_TOKEN_EXPIRE_DATE, '>', Carbon::now())->get();
 
-        if (!$user) {
+        $matchingUser = $usersWithTokens->first(fn($user) => Hash::check($refreshToken, $user->refresh_token));
+
+        if (!$matchingUser) {
             return response()->json(['message' => 'Invalid or expired refresh token'], 401);
         }
 
-        $newAccessToken = $user->createToken('access-token')->plainTextToken;
-
+        $matchingUser->tokens()->delete();
+        $newAccessToken = $matchingUser->createToken('access-token')->plainTextToken;
         $newRefreshToken = base64_encode(random_bytes(64));
-        $user->update([
-            'refresh_token' => $newRefreshToken,
+
+        $matchingUser->update([
+            'refresh_token' => Hash::make($newRefreshToken),
             'refresh_token_expires_at' => Carbon::now()->addDays(),
         ]);
 
