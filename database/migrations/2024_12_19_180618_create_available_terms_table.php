@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('available_terms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('therapist_id')->constrained('therapists')->onDelete('cascade');
-            $table->foreignId('location_id')->constrained('locations')->onDelete('cascade');
+            $table->unsignedBigInteger('therapist_id')->foreignId('therapist_id')->constrained('therapists')->onDelete('cascade');
+            $table->unsignedBigInteger('location_id')->foreignId('location_id')->constrained('locations')->onDelete('cascade');
             $table->date('date');
             $table->integer('time');
             $table->enum('status', ['0', '1', '2'])->default('0');
