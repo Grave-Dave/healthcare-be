@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\CustomVerifyEmail;
 use App\Traits\HasUserStamps;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
     use HasUserstamps;
@@ -110,6 +111,16 @@ class User extends Authenticatable
     }
 
     /**
+     *  Getter for lastName
+     *
+     * @return string|null
+     */
+    public function getUserFullName(): ?string
+    {
+        return $this->getAttribute(self::FIRST_NAME) . " " . $this->getAttribute(self::LAST_NAME);
+    }
+
+    /**
      *  Getter for phone
      *
      * @return string|null
@@ -127,6 +138,11 @@ class User extends Authenticatable
     public function getUserEmail(): ?string
     {
         return $this->getAttribute(self::EMAIL);
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new CustomVerifyEmail());
     }
 
     public function creator(): BelongsTo

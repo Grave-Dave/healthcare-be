@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('DOMAIN_NAME', 'localhost')],
+    'allowed_origins' => [env('APP_URL', 'localhost')],
 
     'allowed_origins_patterns' => [],
 

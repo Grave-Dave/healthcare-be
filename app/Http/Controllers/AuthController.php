@@ -48,6 +48,8 @@ class AuthController extends Controller
             'refresh_token_expires_at' => Carbon::now()->addDays(),
         ]);
 
+        $user->sendEmailVerificationNotification();
+
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
