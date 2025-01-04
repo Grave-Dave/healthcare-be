@@ -80,6 +80,16 @@ class User extends Authenticatable implements MustVerifyEmail
         self::PASSWORD => 'hashed',
     ];
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            $user->email_verified_at = null;
+            $user->save();
+        });
+    }
+
     /**
      * Getter for id
      *

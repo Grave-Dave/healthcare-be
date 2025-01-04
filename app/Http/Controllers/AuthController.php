@@ -6,22 +6,57 @@ use App\Http\Resources\UserResource;
 use App\Models\Therapist;
 use App\Models\User;
 use Exception;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
+    /**
+     * Generate and return access token, refresh token, and set refresh token cookie.
+     *
+     * @param $user
+     * @return JsonResponse
+     * @throws Exception
+     */
+    protected function generateTokenResponse($user): JsonResponse
+    {
+        $token = $user->createToken('access-token')->plainTextToken;
+
+        $refreshToken = base64_encode(random_bytes(64));
+
+        $user->update([
+            'refresh_token' => Hash::make($refreshToken),
+            'refresh_token_expires_at' => Carbon::now()->addDays(),
+        ]);
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ])->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
+    }
+
+    /**
+     * @throws Exception
+     */
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|max:255|unique:users',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->whereNull('deleted_at')
+            ],
+            'phone' => ['required', 'string', 'min:9', 'max:15'],
             'password' => 'required|string|min:8|confirmed',
         ]);
 
@@ -32,30 +67,38 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $user = User::create([
-            'firstName' => $request->firstName,
-            'lastName' => $request->lastName,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-        ]);
+        $oldUser = User::withTrashed()->where('email', $request->email)->first();
 
-        $token = $user->createToken('access-token')->plainTextToken;
-        $refreshToken = base64_encode(random_bytes(64));
+        if ($oldUser) {
+            $oldUser->restore();
+            $oldUser->update([
+                'firstName' => $request->firstName,
+                'lastName' => $request->lastName,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $user->update([
-            'refresh_token' => Hash::make($refreshToken),
-            'refresh_token_expires_at' => Carbon::now()->addDays(),
-        ]);
+            $user = $oldUser;
+        } else {
+            $user = User::create([
+                'firstName' => $request->firstName,
+                'lastName' => $request->lastName,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+            ]);
+        }
 
-        $user->sendEmailVerificationNotification();
+        if ($user instanceof MustVerifyEmail) {
+            $user->sendEmailVerificationNotification();
+        }
 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ], 201)->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
+        return $this->generateTokenResponse($user);
     }
 
+    /**
+     * @throws Exception
+     */
     public function login(Request $request): JsonResponse
     {
         $request->validate([
@@ -65,18 +108,8 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
-            $token = $user->createToken('access-token')->plainTextToken;
-            $refreshToken = base64_encode(random_bytes(64));
 
-            $user->update([
-                'refresh_token' => Hash::make($refreshToken),
-                'refresh_token_expires_at' => Carbon::now()->addDays(),
-            ]);
-
-            return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ])->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
+            return $this->generateTokenResponse($user);
         }
 
         return response()->json(['message' => 'Nieprawidłowe dane'], 403);
@@ -98,6 +131,9 @@ class AuthController extends Controller
         return response()->json(['user' => new UserResource($user), 'isAdmin' => $isAdmin]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function refreshToken(Request $request): JsonResponse
     {
         $refreshToken = $request->cookie('refresh_token');
@@ -111,18 +147,8 @@ class AuthController extends Controller
         }
 
         $matchingUser->tokens()->delete();
-        $newAccessToken = $matchingUser->createToken('access-token')->plainTextToken;
-        $newRefreshToken = base64_encode(random_bytes(64));
 
-        $matchingUser->update([
-            'refresh_token' => Hash::make($newRefreshToken),
-            'refresh_token_expires_at' => Carbon::now()->addDays(),
-        ]);
-
-        return response()->json([
-            'access_token' => $newAccessToken,
-            'token_type' => 'Bearer',
-        ])->cookie('refresh_token', $newRefreshToken, 60 * 24, '/', null, true, true);
+        return $this->generateTokenResponse($matchingUser);
     }
 
     public function logout(Request $request): JsonResponse

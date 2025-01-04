@@ -14,7 +14,7 @@
 <!-- Button to redirect back to the login page or try again -->
 <a href="{{ env('APP_URL') }}"
    style="padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
-    Try Again
+    Wróć do aplikacji
 </a>
 
 </body>

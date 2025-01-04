@@ -5,9 +5,9 @@ use App\Http\Controllers\AdminVisitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvailableTermController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VisitController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,12 +30,24 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/auth/refresh', [AuthController::class, 'refreshToken']);
 
+Route::middleware('throttle:3,1')->group(function () {
+
+    Route::post('password/email', [PasswordResetController::class, 'sendResetLink']);
+
+    Route::post('password/reset', [PasswordResetController::class, 'resetPassword']);
+});
+
 /** SECURED */
 
-Route::middleware('throttle:3,1')->post('/email/resend', function (Request $request) {
+Route::middleware(['auth:sanctum', 'throttle:3,1'])->post('/email/resend', function (Request $request) {
+    if ($request->user()->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email is already verified.'], 400);
+    }
+
     $request->user()->sendEmailVerificationNotification();
+
     return response()->json(['message' => 'Verification email sent.']);
-})->middleware(['auth:sanctum']);
+});
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
