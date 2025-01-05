@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             TherapistSeeder::class,
             Location2TherapistSeeder::class,
-            AvailableTermSeeder::class,
+//            AvailableTermSeeder::class,
         ]);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AfterVisitCanceledByAdmin;
+use App\Events\AfterVisitConfirmed;
 use App\Http\Resources\VisitCollectionResource;
 use App\Models\Therapist;
 use App\Traits\Authorization;
@@ -95,7 +97,7 @@ class AdminVisitController extends Controller
         $visit = Visit::find($visitId);
 
         if (!$visit) {
-            return response()->json(['error' => 'Visit not found.'], 404);
+            return response()->json(['message' => 'Visit not found.'], 404);
         }
 
         $this->authorizeAdmin($user, $visit->availableTerm);
@@ -109,6 +111,8 @@ class AdminVisitController extends Controller
 
         $visit->status = Visit::STATUS_CONFIRMED;
         $visit->save();
+
+        event(new AfterVisitConfirmed($visit->getId()));
 
         return response()->json([
             'message' => 'Visit status updated successfully.',
@@ -139,6 +143,11 @@ class AdminVisitController extends Controller
         }
 
         $visit = Visit::find($visitId);
+
+        if (!$visit) {
+            return response()->json(['message' => 'Visit not found.'], 404);
+        }
+
         $withTerm = $request->withTerm;
 
         $this->authorizeAdmin($user, $visit->availableTerm);
@@ -165,6 +174,8 @@ class AdminVisitController extends Controller
             }
 
             DB::commit();
+
+            event(new AfterVisitCanceledByAdmin($visit->getId()));
 
             return response()->json([
                 'message' => 'Visit canceled successfully.',

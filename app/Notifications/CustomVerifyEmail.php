@@ -23,7 +23,11 @@ class CustomVerifyEmail extends VerifyEmail
         }
 
         return (new MailMessage)
-            ->view('emails.verify-email', ['user' => $notifiable, 'verificationUrl' => $verificationUrl])
+            ->view('emails.verify-email',
+                [
+                    'user' => $notifiable,
+                    'verificationUrl' => $verificationUrl
+                ])
             ->subject('Zweryfikuj adres email');
     }
 }

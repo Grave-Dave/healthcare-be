@@ -18,5 +18,11 @@ class TherapistSeeder extends Seeder
                 Therapist::ID_COLUMN => 1,
                 Therapist::USER_ID => Therapist::MAIN_THERAPIST_ID
             ]);
+
+        Therapist::firstOrCreate(
+            [
+                Therapist::ID_COLUMN => 2,
+                Therapist::USER_ID => 2
+            ]);
     }
 }

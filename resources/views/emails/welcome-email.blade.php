@@ -1,6 +1,6 @@
 @extends('layouts.email')
 
-@section('subject', 'Zmiana hasła')
+@section('subject', 'Powitanie')
 
 @section('header')
     Dzień dobry
@@ -11,9 +11,13 @@
 
     <p>Miło mi gościć Cię na mojej stronie. Poniżej kilka przydatnych informacji na początek: </p>
 
-    <p>Jeżeli chcesz umówić się na wizytę...... </p>
+    <p>Jeżeli chcesz umówić się na wizytę, klinknij w przycisk UMÓW WIZYTĘ w aplikacji, a następnie wybierz interesujący Cię wolny termin w znajdującym się tam kalendarzu. </p>
 
-    <p>Aktualnie przyjmuję w gabinetach...... </p>
+    <p>Aktualnie przyjmuję w gabinetach przy ulicy Obornickiej, Legnickiej i Otmuchowskiej (więcej informacji w sekcji KONTAKT). </p>
+
+    <p>Po zarezerwowaniu terminu, potwierdzę go, a TY otrzymasz powiadomienie na ten adres email. </p>
+
+    <p>Jeżeli masz jakieś pytania, możesz również skontaktować się ze mną telefonicznie. </p>
 
 @endsection
 

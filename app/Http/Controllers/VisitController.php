@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AfterVisitCanceledByUser;
+use App\Events\AfterVisitCreated;
 use App\Http\Resources\VisitCollectionResource;
 use App\Http\Resources\VisitResource;
 use App\Traits\Authorization;
@@ -124,6 +126,8 @@ class VisitController extends Controller
 
             $visit->load([Visit::AVAILABLE_TERM_RELATION . "." . AvailableTerm::LOCATION_RELATION, Visit::USER_RELATION]);
 
+            event(new AfterVisitCreated($visit->getId()));
+
             return response()->json(new VisitResource($visit), 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -149,7 +153,7 @@ class VisitController extends Controller
         $visit = Visit::find($visitId);
 
         if (!$visit) {
-            return response()->json(['error' => 'Visit not found.'], 404);
+            return response()->json(['message' => 'Visit not found.'], 404);
         }
 
         $this->authorizeUser($user, $visit);
@@ -170,6 +174,8 @@ class VisitController extends Controller
             $availableTerm->save();
 
             DB::commit();
+
+            event(new AfterVisitCanceledByUser($visit->getId()));
 
             return response()->json([
                 'message' => 'Visit canceled successfully.',

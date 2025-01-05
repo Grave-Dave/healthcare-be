@@ -7,11 +7,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WelcomeNotification extends Notification implements ShouldQueue
+class NewUserJoinedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    protected $user;
+    private string $userName;
+
+    public function __construct($userName)
+    {
+        $this->userName = $userName;
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -29,8 +34,12 @@ class WelcomeNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->view('emails.welcome-email', ['user' => $notifiable])
-            ->subject('Witaj na mojej stronie');
+            ->view('emails.new-user-joined',
+                [
+                    'user' => $notifiable,
+                    'newUserName' => $this->userName
+                ])
+            ->subject('Nowy użytkownik');
     }
 
     /**
@@ -41,8 +50,9 @@ class WelcomeNotification extends Notification implements ShouldQueue
     public function toDatabase($notifiable)
     {
         return [
-            'subject' => 'Powitanie',
-            'message' => 'Miło mi gościć Cię na mojej stronie. Poniżej kilka przydatnych informacji na początek:',
+            'subject' => 'Nowy użytkownik',
+            'message' => 'Nowy użytkownik zarejestrował się i właśnie zweryfikował swój adres email',
+            'newUserName' => $this->userName
         ];
     }
 }

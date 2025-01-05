@@ -36,8 +36,8 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'firstName' => 'nullable|string|max:255',
             'lastName' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:15|unique:users,phone,' . $user->getId(),
-            'email' => 'nullable|email|unique:users,email,' . $user->getId(),
+            'phone' => 'required|string|min:9|max:15',
+            'email' => 'required|email|unique:users,email,' . $user->getId(),
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 

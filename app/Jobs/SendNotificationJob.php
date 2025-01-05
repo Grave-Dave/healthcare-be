@@ -15,28 +15,28 @@ class SendNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public User $user;
     public Notification $notification;
-    public string $userMail;
+    public User $notifiable;
+    public string $notifiableMail;
     public string $type;
 
-    public function __construct($notification, $user, $type)
+    public function __construct($notification, $notifiable, $type)
     {
         $this->notification = $notification;
-        $this->user = $user;
-        $this->userMail = $user->getUserEmail();
+        $this->notifiable = $notifiable;
+        $this->notifiableMail = $notifiable->getUserEmail();
         $this->type = $type;
     }
 
     public function handle(): void
     {
-        $this->user->notify($this->notification);
+        $this->notifiable->notify($this->notification);
     }
 
     public function failed(\Exception $exception): void
     {
         DB::table('failed_jobs')->where('id', $this->job->getJobId())->update([
-            'user_email' => $this->userMail,
+            'user_email' => $this->notifiableMail,
             'notification_type' => $this->type
         ]);
     }

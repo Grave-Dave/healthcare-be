@@ -17,7 +17,14 @@ class UserSeeder extends Seeder
         User::factory()->create([
             User::FIRST_NAME => 'Kasia',
             User::LAST_NAME => 'Trzeciakiewicz',
-            User::EMAIL => 'kasia@mail.com',
+            User::EMAIL => 'trzeciakiewiczkatarzyna@gmail.com',
+            User::PASSWORD =>  Hash::make('haslo'),
+        ]);
+
+        User::factory()->create([
+            User::FIRST_NAME => 'Dawid',
+            User::LAST_NAME => 'Grabarz',
+            User::EMAIL => 'dawgrab1@gmail.com',
             User::PASSWORD =>  Hash::make('haslo'),
         ]);
 
@@ -28,6 +35,6 @@ class UserSeeder extends Seeder
             User::PASSWORD =>  Hash::make('haslo'),
         ]);
 
-        User::factory(8)->create();
+        User::factory(7)->create();
     }
 }

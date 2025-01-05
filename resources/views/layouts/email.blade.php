@@ -103,22 +103,16 @@
 
                 @yield('content')
 
-                @isset($url)
-                    <p class="button-container">
-                        @php
-                            $buttonText = request()->query('button_text', 'Kliknij tutaj');
-                        @endphp
-                        <a href="{{ $url }}" class="btn">{{ $buttonText }}</a>
-                    </p>
-                @endisset
-
                 <hr/>
 
                 @yield('greetings')
+
             </div>
         </div>
 
         <div class="footer">
+
+            <p> To jest wiadomość wygenerowana automatycznie. Prosimy na nią nie odpowiadać.</p>
 
             <p>&copy; {{ date('Y') }} {{ config('app.name') }}. Wszelkie prawa zastrzeżone.</p>
 
