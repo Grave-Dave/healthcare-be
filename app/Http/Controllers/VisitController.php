@@ -7,6 +7,7 @@ use App\Events\AfterVisitCreated;
 use App\Http\Resources\VisitCollectionResource;
 use App\Http\Resources\VisitResource;
 use App\Traits\Authorization;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use App\Models\Visit;
@@ -34,7 +35,7 @@ class VisitController extends Controller
 
         $this->authorizeUser($user);
 
-        $currentDateTime = now();
+        $currentDateTime = Carbon::now();
 
         $incomingVisits = Visit::select(
             Visit::TABLE_NAME . "." . Visit::ID_COLUMN,
@@ -102,15 +103,18 @@ class VisitController extends Controller
 
         $validatedData = $validator->validated();
 
+        $tomorrow = Carbon::now()->addDay()->startOfDay();
+
         try {
             DB::beginTransaction();
 
             $availableTerm = AvailableTerm::where(AvailableTerm::ID_COLUMN, $validatedData['availableTermId'])
                 ->where(AvailableTerm::STATUS, AvailableTerm::STATUS_AVAILABLE)
+                ->where(AvailableTerm::DATE, '>=', $tomorrow)
                 ->first();
 
             if (!$availableTerm) {
-                return response()->json(['error' => 'The selected term is not available.'], 404);
+                return response()->json(['message' => 'The selected term is not available.'], 404);
             }
 
             $availableTerm->status = AvailableTerm::STATUS_BOOKED;
@@ -133,7 +137,7 @@ class VisitController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'error' => 'An error occurred while creating the visit.',
+                'message' => 'An error occurred while creating the visit.',
                 'details' => $e->getMessage(),
             ], 500);
         }
@@ -184,7 +188,7 @@ class VisitController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'error' => 'An error occurred while canceling the visit.',
+                'message' => 'An error occurred while canceling the visit.',
                 'details' => $e->getMessage(),
             ], 500);
         }

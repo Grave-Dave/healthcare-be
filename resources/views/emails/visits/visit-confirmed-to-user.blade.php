@@ -25,7 +25,14 @@
         </p>
     @endisset
 
+    @isset($locationEntryData)
+
+    <p>Kod do bramy wejściowej to: <strong>{{ $locationEntryData }}</strong>.</p>
+
+    @endisset
+
     <p>Jeżeli masz jakieś pyatania odnośnie nadchodzącej wizyty, skontaktuj się ze mną telefonicznie.</p>
+
 @endsection
 
 @section('greetings')

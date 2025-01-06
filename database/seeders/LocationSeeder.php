@@ -15,13 +15,15 @@ class LocationSeeder extends Seeder
     {
         Location::firstOrCreate(
             [
-                Location::LOCATION_NAME => 'Obornicka 77k/1b, 51-114 Wrocław'
+                Location::LOCATION_NAME => 'Obornicka 77k/1b, 51-114 Wrocław',
+                Location::ENTRY_DATA => '142 kluczyk 8384'
             ]
         );
 
         Location::firstOrCreate(
             [
-                Location::LOCATION_NAME => 'Legnicka 55a/3, 54-234 Wrocław'
+                Location::LOCATION_NAME => 'Legnicka 55a/3, 54-234 Wrocław',
+                Location::ENTRY_DATA => '3 kluczyk 8077'
             ]
         );
 

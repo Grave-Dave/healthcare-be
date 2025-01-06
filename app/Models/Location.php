@@ -17,6 +17,7 @@ class Location extends Model
 
     const ID_COLUMN = 'id';
     const LOCATION_NAME = 'name';
+    const ENTRY_DATA = 'entry_data';
     const THERAPIST_RELATION = 'therapists';
     const AVAILABLE_TERMS_RELATION = 'availableTerms';
 
@@ -31,7 +32,10 @@ class Location extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [self::LOCATION_NAME];
+    protected $fillable = [
+        self::LOCATION_NAME,
+        self::ENTRY_DATA,
+    ];
 
     /**
      * Getter for id
@@ -51,6 +55,16 @@ class Location extends Model
     public function getName(): ?string
     {
         return $this->getAttribute(self::LOCATION_NAME);
+    }
+
+    /**
+     *  Getter for location entryData
+     *
+     * @return string|null
+     */
+    public function getEntryData(): ?string
+    {
+        return $this->getAttribute(self::ENTRY_DATA);
     }
 
     /**

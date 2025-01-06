@@ -13,13 +13,15 @@ class VisitConfirmedNotification extends Notification implements ShouldQueue
 
     private string $userName;
     private string $location;
+    private string $locationEntryData;
     private string $date;
     private string $time;
 
-    public function __construct($userName, $location, $date, $time)
+    public function __construct($userName, $location, $locationEntryData, $date, $time)
     {
         $this->userName = $userName;
         $this->location = $location;
+        $this->locationEntryData = $locationEntryData;
         $this->date = $date;
         $this->time = $time;
     }
@@ -44,6 +46,7 @@ class VisitConfirmedNotification extends Notification implements ShouldQueue
                 'user' => $notifiable,
                 'userName' => $this->userName,
                 'location' => $this->location,
+                'locationEntryData' => $this->locationEntryData,
                 'date' => $this->date,
                 'time' => $this->time,
                 'url' => env('APP_URL') . "/moje-wizyty",
@@ -63,6 +66,7 @@ class VisitConfirmedNotification extends Notification implements ShouldQueue
             'message' => 'Wizyta została potwierdzona. Możesz podejrzeć jej status tutaj',
             'user' => $this->userName,
             'location' => $this->location,
+            'locationEntryData' => $this->locationEntryData,
             'date' => $this->date,
             'time' => $this->time,
         ];

@@ -16,16 +16,11 @@ class Location2TherapistSeeder extends Seeder
     public function run()
     {
 
-        $locations = Location::pluck('id')->toArray();
-        $therapists = Therapist::pluck('id')->toArray();
+        $locationsId = Location::pluck(Location::ID_COLUMN)->toArray();
+        $therapistId = Therapist::MAIN_THERAPIST_ID;
 
-        foreach ($locations as $locationId) {
-
-            $assignedTherapists = array_rand(array_flip($therapists), rand(1, count($therapists)));
-
-            $assignedTherapists = is_array($assignedTherapists) ? $assignedTherapists : [$assignedTherapists];
-
-            Location::find($locationId)->therapists()->attach($assignedTherapists);
+        foreach ($locationsId as $locationId) {
+            Location::find($locationId)->therapists()->attach($therapistId);
         }
     }
 }

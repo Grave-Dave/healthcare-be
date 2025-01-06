@@ -29,7 +29,7 @@ class SendVisitConfirmedNotificationToUserListener
 
         $notifiable = $patient;
 
-        $notification = new VisitConfirmedNotification($patient->getUserFullName(), $location->getName(), $visitTerm->getDate(), $visitTerm->getTime());
+        $notification = new VisitConfirmedNotification($patient->getUserFullName(), $location->getName(), $location->getEntryData(), $visitTerm->getDate(), $visitTerm->getTime());
 
         SendNotificationJob::dispatch($notification, $notifiable, VisitConfirmedNotification::class);
     }

@@ -11,7 +11,7 @@
 
     <p>Miło mi gościć Cię na mojej stronie. Poniżej kilka przydatnych informacji na początek: </p>
 
-    <p>Jeżeli chcesz umówić się na wizytę, klinknij w przycisk <strong>UMÓW WIZYTĘ</strong> w aplikacji, a następnie wybierz interesujący Cię wolny termin w znajdującym się tam kalendarzu. </p>
+    <p>Jeżeli chcesz umówić się na wizytę, kliknij w przycisk <strong>UMÓW WIZYTĘ</strong> w aplikacji, a następnie wybierz interesujący Cię wolny termin w znajdującym się tam kalendarzu. </p>
 
     <p>Aktualnie przyjmuję w gabinetach przy ulicy Obornickiej, Legnickiej i Otmuchowskiej (więcej informacji w sekcji <strong>KONTAKT</strong>). </p>
 
