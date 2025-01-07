@@ -53,6 +53,7 @@ class VisitController extends Controller
             ->where(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE, '>', $currentDateTime)
             ->with([Visit::AVAILABLE_TERM_RELATION . "." . AvailableTerm::LOCATION_RELATION, Visit::USER_RELATION])
             ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE)
+            ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::TIME)
             ->get();
 
         $pastVisits = Visit::select(

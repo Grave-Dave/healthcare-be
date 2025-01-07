@@ -13,7 +13,7 @@ class VisitConfirmedNotification extends Notification implements ShouldQueue
 
     private string $userName;
     private string $location;
-    private string $locationEntryData;
+    private string | null $locationEntryData;
     private string $date;
     private string $time;
 

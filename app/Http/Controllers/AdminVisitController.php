@@ -55,6 +55,7 @@ class AdminVisitController extends Controller
             ->where(Visit::TABLE_NAME . "." . Visit::STATUS, Visit::STATUS_PENDING)
             ->with([Visit::AVAILABLE_TERM_RELATION . "." . AvailableTerm::LOCATION_RELATION, Visit::USER_RELATION])
             ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE)
+            ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::TIME)
             ->get();
 
         $incomingConfirmedVisits = Visit::select(
@@ -74,6 +75,7 @@ class AdminVisitController extends Controller
             ->where(Visit::TABLE_NAME . "." . Visit::STATUS, Visit::STATUS_CONFIRMED)
             ->with([Visit::AVAILABLE_TERM_RELATION . "." . AvailableTerm::LOCATION_RELATION, Visit::USER_RELATION])
             ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::DATE)
+            ->orderBy(AvailableTerm::TABLE_NAME . "." . AvailableTerm::TIME)
             ->get();
 
         return response()->json([
