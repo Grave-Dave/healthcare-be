@@ -34,7 +34,5 @@ class UserSeeder extends Seeder
             User::EMAIL => 'random@mail.com',
             User::PASSWORD =>  Hash::make('haslo'),
         ]);
-
-        User::factory(7)->create();
     }
 }
