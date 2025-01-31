@@ -33,9 +33,15 @@ Route::post('/auth/refresh', [AuthController::class, 'refreshToken']);
 Route::middleware('throttle:3,1')->group(function () {
 
     Route::post('password/email', [PasswordResetController::class, 'sendResetLink']);
-
-    Route::post('password/reset', [PasswordResetController::class, 'resetPassword']);
 });
+
+Route::post('password/reset', [PasswordResetController::class, 'resetPassword']);
+
+/** AVAILABLE TERMS NOT SECURED */
+
+Route::post('/month-terms', [AvailableTermController::class, 'index']);
+
+Route::post('/terms', [AvailableTermController::class, 'show']);
 
 /** SECURED */
 
@@ -70,10 +76,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/locations', [LocationController::class, 'index']);
 
     /** AVAILABLE TERMS */
-
-    Route::post('/month-terms', [AvailableTermController::class, 'index']);
-
-    Route::post('/terms', [AvailableTermController::class, 'show']);
 
     Route::post('/new-terms', [AvailableTermController::class, 'store']);
 

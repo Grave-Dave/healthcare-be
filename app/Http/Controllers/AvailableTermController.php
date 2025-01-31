@@ -32,10 +32,6 @@ class AvailableTermController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $user = Auth::user();
-
-        $this->authorizeUser($user);
-
         $validatedDate = $request->validate([
             'month' => ['required', 'string', 'size:2', 'regex:/^(0[1-9]|1[0-2])$/'],
             'year' => ['required', 'integer', 'min:2000'],
@@ -65,10 +61,6 @@ class AvailableTermController extends Controller
      */
     public function show(Request $request): JsonResponse
     {
-        $user = Auth::user();
-
-        $this->authorizeUser($user);
-
         $validatedDate = $request->validate([
             'date' => ['required', 'date', 'date_format:Y-m-d'],
         ]);
