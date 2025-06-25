@@ -26,6 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
     const FIRST_NAME = 'firstName';
     const LAST_NAME = 'lastName';
     const EMAIL = 'email';
+    const AVATAR = 'avatar';
     const PHONE = 'phone';
     const PASSWORD = 'password';
     const THERAPIST_RELATION = 'therapist';
@@ -52,9 +53,11 @@ class User extends Authenticatable implements MustVerifyEmail
         self::LAST_NAME,
         self::PHONE,
         self::EMAIL,
+        self::AVATAR,
         self::PASSWORD,
         self::REFRESH_TOKEN,
         self::REFRESH_TOKEN_EXPIRE_DATE,
+        'email_verified_at',
         self::CREATED_BY,
         self::UPDATED_BY,
         self::DELETED_BY,
@@ -148,6 +151,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getUserEmail(): ?string
     {
         return $this->getAttribute(self::EMAIL);
+    }
+
+    /**
+     *  Getter for avatar
+     *
+     * @return string|null
+     */
+    public function getUserAvatar(): ?string
+    {
+        return $this->getAttribute(self::AVATAR);
     }
 
     public function sendEmailVerificationNotification(): void

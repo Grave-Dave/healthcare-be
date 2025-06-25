@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Requests\CustomEmailVerificationRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,3 +28,12 @@ Route::get('/email/verify/{id}/{hash}', function (CustomEmailVerificationRequest
 
     return view('verification.failed', ['message' => 'Coś poszło nie tak...']);
 })->middleware(['signed'])->name('verification.verify');
+
+/** GOOGLE AUTH */
+
+Route::prefix('api/auth/google')->group(function () {
+
+    Route::get('/redirect', [GoogleAuthController::class, 'redirectToGoogle']);
+
+    Route::get('/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+});

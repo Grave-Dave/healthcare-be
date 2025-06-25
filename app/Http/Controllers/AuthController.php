@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserResource;
 use App\Models\Therapist;
 use App\Models\User;
+use App\Services\AuthService;
 use Exception;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
@@ -18,33 +19,23 @@ use Illuminate\Validation\Rule;
 class AuthController extends Controller
 {
     /**
-     * Generate and return access token, refresh token, and set refresh token cookie.
+     * Return access token, refresh token, and set refresh token cookie.
      *
-     * @param $user
+     * @param $tokens
      * @return JsonResponse
-     * @throws Exception
      */
-    protected function generateTokenResponse($user): JsonResponse
+    protected function generateTokenResponse($tokens): JsonResponse
     {
-        $token = $user->createToken('access-token')->plainTextToken;
-
-        $refreshToken = base64_encode(random_bytes(64));
-
-        $user->update([
-            'refresh_token' => Hash::make($refreshToken),
-            'refresh_token_expires_at' => Carbon::now()->addDays(),
-        ]);
-
         return response()->json([
-            'access_token' => $token,
+            'access_token' => $tokens['accessToken'],
             'token_type' => 'Bearer',
-        ])->cookie('refresh_token', $refreshToken, 60 * 24, '/', null, true, true);
+        ])->cookie('refresh_token', $tokens['refreshToken'], 60 * 24, '/', null, true, true);
     }
 
     /**
      * @throws Exception
      */
-    public function register(Request $request): JsonResponse
+    public function register(Request $request, AuthService $service): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'firstName' => 'required|string|max:255',
@@ -93,13 +84,15 @@ class AuthController extends Controller
             $user->sendEmailVerificationNotification();
         }
 
-        return $this->generateTokenResponse($user);
+        $tokens = $service->generateTokens($user);
+
+        return $this->generateTokenResponse($tokens);
     }
 
     /**
      * @throws Exception
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request, AuthService $service): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -109,7 +102,9 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
 
-            return $this->generateTokenResponse($user);
+            $tokens = $service->generateTokens($user);
+
+            return $this->generateTokenResponse($tokens);
         }
 
         return response()->json(['message' => 'Nieprawidłowe dane'], 403);
@@ -134,7 +129,7 @@ class AuthController extends Controller
     /**
      * @throws Exception
      */
-    public function refreshToken(Request $request): JsonResponse
+    public function refreshToken(Request $request, AuthService $service): JsonResponse
     {
         $refreshToken = $request->cookie('refresh_token');
 
@@ -148,7 +143,9 @@ class AuthController extends Controller
 
         $matchingUser->tokens()->delete();
 
-        return $this->generateTokenResponse($matchingUser);
+        $tokens = $service->generateTokens($matchingUser);
+
+        return $this->generateTokenResponse($tokens);
     }
 
     public function logout(Request $request): JsonResponse
