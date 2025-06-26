@@ -3,11 +3,11 @@
 namespace App\Listeners;
 
 use App\Events\AfterVisitCanceledByAdmin;
-use App\Events\AfterVisitConfirmed;
 use App\Jobs\SendNotificationJob;
 use App\Models\Location;
 use App\Models\Visit;
 use App\Notifications\VisitCanceledByAdminNotificationToUser;
+use Illuminate\Support\Facades\Log;
 
 class SendVisitCanceledByAdminNotificationToUserListener
 {
@@ -23,6 +23,16 @@ class SendVisitCanceledByAdminNotificationToUserListener
         $patient = $visit->getRelationValue(Visit::USER_RELATION);
 
         $visitTerm = $visit->getRelationValue(Visit::AVAILABLE_TERM_RELATION);
+
+        if (!$visitTerm) {
+            try {
+                $visitTerm = $visit->load([Visit::AVAILABLE_TERM_RELATION => function ($query) {
+                    $query->withTrashed();
+                }])->availableTerm;
+            } catch (\Exception $exception) {
+                Log::error($exception->getMessage());
+            }
+        }
 
         $location = Location::where(Location::ID_COLUMN, $visitTerm->getLocationId())->first();
 

@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\AuthService;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
@@ -41,7 +39,6 @@ class GoogleAuthController extends Controller
                     'lastName' => $googleUser->user['family_name'] ?? null,
                     'phone' => null,
                     'password' => bcrypt(uniqid()),
-                    'email_verified_at' => now()
                 ]);
 
                 $user = $oldUser;
@@ -54,9 +51,14 @@ class GoogleAuthController extends Controller
                         'avatar' => $googleUser->getAvatar(),
                         'password' => bcrypt(uniqid()),
                         'phone' => null,
-                        'email_verified_at' => now()
                     ]
                 );
+            }
+
+            if (!$user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+
+                event(new Verified($user));
             }
         } catch (\Exception $e) {
             return redirect($baseUrl . "/login/google");

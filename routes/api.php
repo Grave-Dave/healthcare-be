@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminPanelController;
 use App\Http\Controllers\AdminVisitController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AvailableTermController;
+use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController;
@@ -62,6 +63,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/user', [AuthController::class, 'checkAuth']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::post('/impersonate/{userId}', [ImpersonationController::class, 'impersonate']);
 
     /** USER DATA */
 
